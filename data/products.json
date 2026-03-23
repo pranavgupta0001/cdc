@@ -47,6 +47,19 @@
           "price": "344"
         }
       ]
+    },
+    {
+      "id": "7dl10xzmn2tr9mn",
+      "name": "bhh",
+      "category": "Door Handles",
+      "photo": "",
+      "variants": [
+        {
+          "finish": "dg",
+          "size": "33",
+          "price": "344"
+        }
+      ]
     }
   ]
 }
