@@ -3,23 +3,41 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Price List</title>
+<title>CDC Industries — Price List</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f5f2ee;
+    --bg: #ffffff;
     --card-bg: #ffffff;
-    --accent: #1a3a4a;
-    --accent2: #c8a96e;
+    --accent: #1a1a1a;
+    --accent2: #C1D653;
     --text: #1c1c1c;
     --muted: #6b6b6b;
-    --border: #e0d9d0;
+    --border: #e0e0e0;
     --danger: #c0392b;
     --success: #27ae60;
-    --header-bg: #1a3a4a;
+    --header-bg: #1a1a1a;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* FOOTER */
+  footer {
+    background: #1a1a1a;
+    color: #fff;
+    padding: 32px 40px;
+    margin-top: 60px;
+    border-top: 4px solid #C1D653;
+  }
+  .footer-inner { max-width: 1400px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 32px; justify-content: space-between; align-items: flex-start; }
+  .footer-logo-block { display: flex; align-items: center; gap: 16px; }
+  .footer-logo-block img { height: 56px; width: auto; object-fit: contain; }
+  .footer-company-name { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: #C1D653; line-height: 1.3; }
+  .footer-tagline { font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: #aaa; margin-top: 3px; }
+  .footer-contact { font-size: 0.82rem; line-height: 1.9; color: #ccc; }
+  .footer-contact a { color: #C1D653; text-decoration: none; }
+  .footer-contact strong { color: #fff; }
+  .footer-bottom { max-width: 1400px; margin: 20px auto 0; padding-top: 16px; border-top: 1px solid #333; font-size: 0.74rem; color: #666; text-align: center; }
 
   /* HEADER */
   header {
@@ -301,9 +319,12 @@
 
 <!-- HEADER -->
 <header>
-  <div class="brand">
-    <div class="brand-name" id="headerBrandName">My Brand</div>
-    <div class="brand-sub" id="headerBrandSub">PRICE LIST</div>
+  <div class="brand" style="display:flex;align-items:center;gap:16px;">
+    <img src="images/CDC_LOGO_IMAGE.jpg" alt="CDC Industries Logo" style="height:54px;width:auto;object-fit:contain;border-radius:4px;">
+    <div>
+      <div class="brand-name" id="headerBrandName">CDC INDUSTRIES</div>
+      <div class="brand-sub" id="headerBrandSub">PRICE LIST</div>
+    </div>
   </div>
   <div class="header-actions">
     <button class="btn btn-outline" onclick="window.print()">🖨 Print</button>
@@ -525,6 +546,28 @@
   </div>
 </div>
 
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo-block">
+      <img src="images/CDC_LOGO_IMAGE.jpg" alt="CDC Industries Logo">
+      <div>
+        <div class="footer-company-name">CDC INDUSTRIES PRIVATE LIMITED</div>
+        <div class="footer-tagline">Quality Hardware Products</div>
+      </div>
+    </div>
+    <div class="footer-contact">
+      <strong>Sanjeev Gupta</strong><br>
+      HNO B-20/194/1, Govind Nagar,<br>
+      Near Shiv Mandir, Hoshiarpur,<br>
+      Punjab – 146001<br>
+      <a href="mailto:cdcindustriespvtltd@gmail.com">cdcindustriespvtltd@gmail.com</a><br>
+      <a href="tel:+919417011352">+91 94170 11352</a>
+    </div>
+  </div>
+  <div class="footer-bottom">© CDC Industries Private Limited · All rights reserved</div>
+</footer>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
@@ -533,10 +576,10 @@
 //  STATE
 // ═══════════════════════════════════════════
 const DEFAULT_STATE = {
-  brandName: 'My Brand',
+  brandName: 'CDC INDUSTRIES',
   brandSub: 'PRICE LIST',
-  accentColor: '#1a3a4a',
-  goldColor: '#c8a96e',
+  accentColor: '#1a1a1a',
+  goldColor: '#C1D653',
   adminPass: 'admin123',
   categories: [],
   products: []
@@ -547,9 +590,9 @@ let isAdmin = false;
 let activeCategory = 'all';
 let editingProductId = null;
 
-// GitHub config stored in localStorage (not in the public JSON)
+// GitHub config — repo defaults hardcoded; token stored only in localStorage
 let ghConfig = {
-  user: '', repo: '', branch: 'main', token: ''
+  user: 'pranavgupta0001', repo: 'cdc', branch: 'main', token: ''
 };
 
 let dataFileSHA = null; // needed for GitHub API updates
