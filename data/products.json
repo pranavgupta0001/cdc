@@ -6,7 +6,8 @@
   "adminPass": "admin123",
   "categories": [
     "cat1",
-    "cad2"
+    "cad2",
+    "cat3"
   ],
   "products": [
     {
