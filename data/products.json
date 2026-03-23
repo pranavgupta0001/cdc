@@ -5,7 +5,8 @@
   "goldColor": "#C1D653",
   "adminPass": "admin123",
   "categories": [
-    "cat1"
+    "cat1",
+    "cat2"
   ],
   "products": []
 }
