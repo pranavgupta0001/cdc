@@ -7,5 +7,19 @@
   "categories": [
     "cat1"
   ],
-  "products": []
+  "products": [
+    {
+      "id": "k3uayxjmn2rngw2",
+      "name": "aoeu",
+      "category": "cat1",
+      "photo": "",
+      "variants": [
+        {
+          "finish": "euu",
+          "size": "22",
+          "price": "44"
+        }
+      ]
+    }
+  ]
 }
