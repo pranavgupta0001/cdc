@@ -845,10 +845,7 @@ function filterCategory(cat, el) {
     return;
   }
   const section = document.getElementById('section-' + slugify(cat));
-  if (section) {
-    const offset = section.getBoundingClientRect().top + window.scrollY - 80;
-    window.scrollTo({ top: offset, behavior: 'smooth' });
-  }
+  if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // ═══════════════════════════════════════════
@@ -886,13 +883,12 @@ function renderProducts() {
   categories.forEach(cat => {
     const prods = state.products.filter(p => p.category === cat);
     if (prods.length === 0) {
-      html += `<div class="cat-section">
+      html += `<div class="cat-section" id="section-${slugify(cat)}">
         <div class="section-header"><div class="section-title">${esc(cat)}</div><span class="section-count">0 items</span></div>
         <div class="state-box" style="padding:40px 20px;"><p>No products in this category yet.</p></div>
       </div>`;
       return;
     }
-    if (prods.length === 0) return;
     anyShown = true;
 
     html += `<div class="cat-section" id="section-${slugify(cat)}">
