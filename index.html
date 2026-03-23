@@ -616,9 +616,14 @@ function rawUrl(path) {
 }
 
 function b64decode(str) {
-  const binary = atob(str.replace(/\n/g, ''));
-  const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
-  return new TextDecoder().decode(bytes);
+  return decodeURIComponent(atob(str.replace(/\s/g, '')).split('').map(c =>
+    '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+  ).join(''));
+}
+function b64encode(str) {
+  return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
+    (_, p) => String.fromCharCode(parseInt(p, 16))
+  ));
 }
 
 async function loadFromGitHub() {
@@ -628,18 +633,28 @@ async function loadFromGitHub() {
     return;
   }
   try {
-    const headers = { 'Accept': 'application/vnd.github+json' };
-    if (ghConfig.token) headers['Authorization'] = `Bearer ${ghConfig.token}`;
-    const res = await fetch(ghContentUrl('data/products.json') + '&t=' + Date.now(), { headers });
-    if (res.ok) {
-      const file = await res.json();
-      state = { ...DEFAULT_STATE, ...JSON.parse(b64decode(file.content)) };
-      dataFileSHA = file.sha;
-    } else if (res.status === 404) {
-      state = { ...DEFAULT_STATE };
+    // Step 1: fetch SHA via contents API (always works, even for large files)
+    const metaHeaders = { 'Accept': 'application/vnd.github+json' };
+    if (ghConfig.token) metaHeaders['Authorization'] = `Bearer ${ghConfig.token}`;
+    const metaRes = await fetch(ghContentUrl('data/products.json'), { headers: metaHeaders });
+    if (metaRes.status === 404) { state = { ...DEFAULT_STATE }; applyTheme(); renderBrand(); renderCategoryNav(); renderProducts(); return; }
+    if (metaRes.ok) {
+      const meta = await metaRes.json();
+      dataFileSHA = meta.sha;
+      // If content is present and not truncated, use it directly
+      if (meta.content && meta.content.length > 10) {
+        state = { ...DEFAULT_STATE, ...JSON.parse(b64decode(meta.content)) };
+      } else {
+        // Step 2: file too large for contents API — fetch via raw URL
+        const rawHeaders = {};
+        if (ghConfig.token) rawHeaders['Authorization'] = `Bearer ${ghConfig.token}`;
+        const rawRes = await fetch(rawUrl('data/products.json') + '?t=' + Date.now(), { headers: rawHeaders });
+        if (!rawRes.ok) throw new Error('Raw fetch HTTP ' + rawRes.status);
+        state = { ...DEFAULT_STATE, ...await rawRes.json() };
+      }
     } else {
-      const err = await res.json().catch(() => ({}));
-      throw new Error((err.message || 'HTTP ' + res.status));
+      const err = await metaRes.json().catch(() => ({}));
+      throw new Error(err.message || 'HTTP ' + metaRes.status);
     }
   } catch (e) {
     console.error('GitHub load error:', e);
@@ -689,9 +704,7 @@ async function saveToGitHub() {
   }
 
   setSaveStatus('saving');
-  const json = JSON.stringify(state, null, 2);
-  const bytes = new TextEncoder().encode(json);
-  const newContent = btoa(String.fromCharCode(...bytes));
+  const newContent = b64encode(JSON.stringify(state, null, 2));
 
   try {
     // Step 1: back up current file before overwriting
