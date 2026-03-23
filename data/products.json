@@ -2,8 +2,10 @@
   "brandName": "CDC INDUSTRIES",
   "brandSub": "PRICE LIST",
   "accentColor": "#1a1a1a",
-  "goldColor": "#c1d653",
+  "goldColor": "#C1D653",
   "adminPass": "admin123",
-  "categories": [],
+  "categories": [
+    "cat1"
+  ],
   "products": []
 }
