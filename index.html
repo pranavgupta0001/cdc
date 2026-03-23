@@ -621,10 +621,8 @@ async function loadFromGitHub() {
     return;
   }
   try {
-    // Use authenticated API — works for both public and private repos
-    const headers = { 'Accept': 'application/vnd.github+json' };
-    if (ghConfig.token) headers['Authorization'] = `Bearer ${ghConfig.token}`;
-    const res = await fetch(ghContentUrl('data/products.json') + '&t=' + Date.now(), { headers });
+    // Use authenticated API (works for public and private repos)
+    const res = await fetch(ghContentUrl('data/products.json') + '&t=' + Date.now(), { headers: ghHeaders(true) });
     if (res.ok) {
       const file = await res.json();
       const decoded = JSON.parse(decodeURIComponent(escape(atob(file.content.replace(/\n/g, '')))));
@@ -653,6 +651,28 @@ async function fetchFileSHA() {
   } catch(e) {}
 }
 
+async function getFileSHA(path) {
+  try {
+    const res = await fetch(
+      `https://api.github.com/repos/${ghConfig.user}/${ghConfig.repo}/contents/${path}?ref=${ghConfig.branch}`,
+      { headers: ghHeaders(true) }
+    );
+    if (res.ok) { const d = await res.json(); return d.sha || null; }
+  } catch(e) {}
+  return null;
+}
+
+async function writeFileToGitHub(path, content, message, sha) {
+  const body = { message, content, branch: ghConfig.branch };
+  if (sha) body.sha = sha;
+  const res = await fetch(
+    `https://api.github.com/repos/${ghConfig.user}/${ghConfig.repo}/contents/${path}`,
+    { method: 'PUT', headers: ghHeaders(true), body: JSON.stringify(body) }
+  );
+  if (!res.ok) { const e = await res.json(); throw new Error(e.message || 'Write failed'); }
+  return (await res.json()).content?.sha;
+}
+
 async function saveToGitHub() {
   if (!ghConfig.user || !ghConfig.repo || !ghConfig.token) {
     showToast('Configure GitHub settings first', 'error');
@@ -660,31 +680,24 @@ async function saveToGitHub() {
   }
 
   setSaveStatus('saving');
-
-  const content = btoa(unescape(encodeURIComponent(JSON.stringify(state, null, 2))));
-  const body = {
-    message: 'Update price list data',
-    content,
-    branch: ghConfig.branch
-  };
-  if (dataFileSHA) body.sha = dataFileSHA;
+  const newContent = btoa(unescape(encodeURIComponent(JSON.stringify(state, null, 2))));
 
   try {
-    const res = await fetch(ghContentUrl('data/products.json'), {
-      method: 'PUT',
-      headers: ghHeaders(true),
-      body: JSON.stringify(body)
-    });
-
-    if (res.ok) {
-      const data = await res.json();
-      dataFileSHA = data.content?.sha;
-      setSaveStatus('saved');
-      return true;
-    } else {
-      const err = await res.json();
-      throw new Error(err.message || 'Save failed');
+    // Step 1: back up current file before overwriting
+    if (dataFileSHA) {
+      const ts = new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+      const backupPath = `data/backups/products_${ts}.json`;
+      const currentRes = await fetch(ghContentUrl('data/products.json'), { headers: ghHeaders(true) });
+      if (currentRes.ok) {
+        const currentFile = await currentRes.json();
+        await writeFileToGitHub(backupPath, currentFile.content.replace(/\n/g,''), `Backup before update ${ts}`, null);
+      }
     }
+
+    // Step 2: save new data
+    dataFileSHA = await writeFileToGitHub('data/products.json', newContent, 'Update price list data', dataFileSHA);
+    setSaveStatus('saved');
+    return true;
   } catch(e) {
     setSaveStatus('error');
     showToast('Save failed: ' + e.message, 'error');
