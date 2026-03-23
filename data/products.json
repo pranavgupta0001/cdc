@@ -34,6 +34,19 @@
           "price": "344"
         }
       ]
+    },
+    {
+      "id": "pa0ermwmn2tr18c",
+      "name": "test2",
+      "category": "Door Handles",
+      "photo": "",
+      "variants": [
+        {
+          "finish": "oau",
+          "size": "88",
+          "price": "344"
+        }
+      ]
     }
   ]
 }
