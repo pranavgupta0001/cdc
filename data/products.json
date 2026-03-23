@@ -60,6 +60,19 @@
           "price": "344"
         }
       ]
+    },
+    {
+      "id": "49yndv3mn2trlid",
+      "name": "hbhb",
+      "category": "Door Handles",
+      "photo": "",
+      "variants": [
+        {
+          "finish": "hbh",
+          "size": "34",
+          "price": "3444"
+        }
+      ]
     }
   ]
 }
