@@ -616,21 +616,21 @@ function rawUrl(path) {
 
 async function loadFromGitHub() {
   if (!ghConfig.user || !ghConfig.repo) {
-    // No GitHub config — try localStorage fallback
     loadFromLocalStorage();
+    applyTheme(); renderBrand(); renderCategoryNav(); renderProducts();
     return;
   }
   try {
-    // Use raw URL (no auth needed for public repos)
-    const res = await fetch(rawUrl('data/products.json') + '?nocache=' + Date.now());
+    // Use authenticated API — works for both public and private repos
+    const headers = { 'Accept': 'application/vnd.github+json' };
+    if (ghConfig.token) headers['Authorization'] = `Bearer ${ghConfig.token}`;
+    const res = await fetch(ghContentUrl('data/products.json') + '&t=' + Date.now(), { headers });
     if (res.ok) {
-      const data = await res.json();
-      state = { ...DEFAULT_STATE, ...data };
-
-      // Also fetch SHA (needed for future updates) via API
-      fetchFileSHA();
+      const file = await res.json();
+      const decoded = JSON.parse(decodeURIComponent(escape(atob(file.content.replace(/\n/g, '')))));
+      state = { ...DEFAULT_STATE, ...decoded };
+      dataFileSHA = file.sha;
     } else if (res.status === 404) {
-      // File doesn't exist yet — fresh start
       state = { ...DEFAULT_STATE };
     } else {
       throw new Error('HTTP ' + res.status);
