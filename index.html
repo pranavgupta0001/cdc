@@ -557,7 +557,7 @@
       </div>
     </div>
     <div class="footer-contact">
-      <strong>Sanjeev Gupta</strong><br>
+      <strong>CDC</strong><br>
       HNO B-20/194/1, Govind Nagar,<br>
       Near Shiv Mandir, Hoshiarpur,<br>
       Punjab – 146001<br>
@@ -838,10 +838,17 @@ function renderCategoryNav() {
 }
 
 function filterCategory(cat, el) {
-  activeCategory = cat;
   document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  renderProducts();
+  if (cat === 'all') {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+  const section = document.getElementById('section-' + slugify(cat));
+  if (section) {
+    const offset = section.getBoundingClientRect().top + window.scrollY - 80;
+    window.scrollTo({ top: offset, behavior: 'smooth' });
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -849,7 +856,7 @@ function filterCategory(cat, el) {
 // ═══════════════════════════════════════════
 function renderProducts() {
   const container = document.getElementById('mainContent');
-  const categories = activeCategory === 'all' ? state.categories : [activeCategory];
+  const categories = state.categories;
 
   // Show setup banner if GitHub not configured and admin
   let setupBanner = '';
@@ -878,7 +885,7 @@ function renderProducts() {
 
   categories.forEach(cat => {
     const prods = state.products.filter(p => p.category === cat);
-    if (prods.length === 0 && activeCategory !== 'all') {
+    if (prods.length === 0) {
       html += `<div class="cat-section">
         <div class="section-header"><div class="section-title">${esc(cat)}</div><span class="section-count">0 items</span></div>
         <div class="state-box" style="padding:40px 20px;"><p>No products in this category yet.</p></div>
@@ -925,7 +932,7 @@ function renderProducts() {
     html += `</div></div>`;
   });
 
-  if (!anyShown && activeCategory === 'all') {
+  if (!anyShown) {
     html += `<div class="state-box"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><h3>No products yet</h3><p>Add your first product using the admin panel.</p></div>`;
   }
 
