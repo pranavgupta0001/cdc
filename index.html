@@ -1087,7 +1087,7 @@ function openSettings() {
   document.getElementById('setNewPass').value = '';
   document.getElementById('setConfPass').value = '';
   document.getElementById('ghStatus').style.display = 'none';
-  openModal('settings');
+  document.getElementById('modal-settings').classList.add('open');
 }
 
 function saveSettings() {
