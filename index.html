@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Price List</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f2ee;
+    --card-bg: #ffffff;
+    --accent: #1a3a4a;
+    --accent2: #c8a96e;
+    --text: #1c1c1c;
+    --muted: #6b6b6b;
+    --border: #e0d9d0;
+    --danger: #c0392b;
+    --success: #27ae60;
+    --header-bg: #1a3a4a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* HEADER */
+  header {
+    background: var(--header-bg);
+    color: #fff;
+    padding: 22px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.25);
+  }
+  .brand-name { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900; letter-spacing: 0.04em; line-height: 1; }
+  .brand-sub { font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent2); margin-top: 4px; }
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+
+  /* BUTTONS */
+  .btn {
+    padding: 9px 20px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    transition: all 0.18s;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-outline { background: transparent; border: 1.5px solid rgba(255,255,255,0.4); color: #fff; }
+  .btn-outline:hover:not(:disabled) { background: rgba(255,255,255,0.1); border-color: #fff; }
+  .btn-gold { background: var(--accent2); color: #1a1a1a; }
+  .btn-gold:hover:not(:disabled) { filter: brightness(1.08); }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover:not(:disabled) { filter: brightness(1.15); }
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-danger:hover:not(:disabled) { background: #a93226; }
+  .btn-ghost { background: var(--bg); color: var(--text); border: 1.5px solid var(--border); }
+  .btn-ghost:hover:not(:disabled) { background: var(--border); }
+  .btn-sm { padding: 6px 14px; font-size: 0.75rem; }
+  .btn-xs { padding: 4px 10px; font-size: 0.72rem; }
+
+  /* CATEGORY NAV */
+  .cat-nav {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .cat-nav::-webkit-scrollbar { display: none; }
+  .cat-tab {
+    padding: 14px 22px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    border-left: none; border-right: none; border-top: none;
+    white-space: nowrap;
+    transition: all 0.18s;
+    background: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .cat-tab:hover { color: var(--accent); }
+  .cat-tab.active { color: var(--accent); border-bottom-color: var(--accent2); }
+
+  /* ADMIN BAR */
+  .admin-bar {
+    background: #1c1c1c;
+    color: #fff;
+    padding: 10px 40px;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .admin-bar.visible { display: flex; }
+  .admin-bar-label { display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--accent2); }
+  .admin-bar-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent2); animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .admin-bar-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .save-status { font-size: 0.75rem; color: #aaa; display: flex; align-items: center; gap: 6px; }
+  .save-dot { width: 6px; height: 6px; border-radius: 50%; background: #aaa; }
+  .save-dot.saving { background: var(--accent2); animation: pulse 0.8s infinite; }
+  .save-dot.saved { background: var(--success); }
+  .save-dot.error { background: var(--danger); }
+
+  /* MAIN */
+  main { padding: 40px; max-width: 1400px; margin: 0 auto; }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid var(--accent);
+  }
+  .section-title { font-family: 'Playfair Display', serif; font-size: 1.7rem; font-weight: 700; color: var(--accent); }
+  .section-count { font-size: 0.78rem; color: var(--muted); background: var(--border); padding: 3px 10px; border-radius: 20px; font-weight: 500; }
+
+  /* PRODUCT GRID */
+  .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-bottom: 60px; }
+
+  /* PRODUCT CARD */
+  .product-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    border: 1px solid var(--border);
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+  }
+  .product-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,0.12); }
+  .card-img-wrap { background: #e8e4de; height: 200px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+  .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+  .card-no-img { display: flex; flex-direction: column; align-items: center; gap: 10px; color: #b0a898; }
+  .card-no-img svg { opacity: 0.4; }
+  .card-no-img span { font-size: 0.75rem; font-weight: 500; }
+  .card-admin-btns { position: absolute; top: 8px; right: 8px; display: none; gap: 6px; }
+  .admin-mode .card-admin-btns { display: flex; }
+  .card-admin-btns button { width: 30px; height: 30px; border-radius: 6px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+  .btn-edit-card { background: rgba(26,58,74,0.9); color: #fff; }
+  .btn-del-card { background: rgba(192,57,43,0.9); color: #fff; }
+  .card-name { padding: 14px 14px 6px; font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 700; color: var(--accent); }
+  .card-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+  .card-table thead tr { background: var(--accent); color: #fff; }
+  .card-table thead th { padding: 8px 12px; text-align: left; font-weight: 600; letter-spacing: 0.05em; font-size: 0.72rem; text-transform: uppercase; }
+  .card-table tbody tr { border-bottom: 1px solid var(--border); }
+  .card-table tbody tr:last-child { border-bottom: none; }
+  .card-table tbody tr:nth-child(even) { background: #faf8f5; }
+  .card-table td { padding: 7px 12px; font-weight: 500; }
+  .card-table td.price { font-weight: 700; color: var(--accent); }
+
+  /* EMPTY / LOADING STATE */
+  .state-box { text-align: center; padding: 80px 20px; color: var(--muted); }
+  .state-box svg { margin-bottom: 20px; opacity: 0.3; }
+  .state-box h3 { font-size: 1.2rem; margin-bottom: 8px; }
+  .state-box p { font-size: 0.9rem; line-height: 1.6; }
+  .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 20px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 999;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(3px);
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal {
+    background: #fff; border-radius: 14px;
+    width: 100%; max-width: 580px; max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    transform: translateY(20px); transition: transform 0.2s;
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal-header { padding: 22px 28px 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .modal-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; color: var(--accent); }
+  .modal-close { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--muted); }
+  .modal-body { padding: 24px 28px; }
+  .modal-footer { padding: 16px 28px 24px; display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border); }
+
+  /* FORM */
+  .form-group { margin-bottom: 18px; }
+  .form-label { display: block; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
+  .form-control { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 7px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; color: var(--text); background: #fafafa; transition: border-color 0.18s; outline: none; }
+  .form-control:focus { border-color: var(--accent); background: #fff; }
+  select.form-control { cursor: pointer; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-hint { font-size: 0.75rem; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+  .form-hint a { color: var(--accent); }
+  .form-hint code { background: #f0ede8; padding: 1px 5px; border-radius: 3px; font-size: 0.72rem; }
+
+  /* VARIANTS */
+  .variants-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .variants-label { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  .variant-cols { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 8px; margin-bottom: 6px; padding: 0 2px; }
+  .variant-col-label { font-size: 0.7rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+  .variant-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .variant-row input { padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 0.83rem; outline: none; width: 100%; background: #fafafa; }
+  .variant-row input:focus { border-color: var(--accent); background: #fff; }
+  .btn-remove-variant { background: #fdecea; color: var(--danger); border: none; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+  /* PHOTO */
+  .photo-upload-area { border: 2px dashed var(--border); border-radius: 10px; padding: 24px; text-align: center; cursor: pointer; transition: border-color 0.18s, background 0.18s; position: relative; }
+  .photo-upload-area:hover { border-color: var(--accent); background: #f5f2ee; }
+  .photo-upload-area input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .photo-preview { width: 100%; max-height: 180px; object-fit: cover; border-radius: 8px; margin-top: 12px; display: none; }
+  .upload-icon { font-size: 2rem; margin-bottom: 8px; }
+  .upload-text { font-size: 0.85rem; color: var(--muted); }
+  .photo-url-row { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+  .photo-url-row input { flex: 1; }
+  .photo-tabs { display: flex; gap: 0; border: 1.5px solid var(--border); border-radius: 7px; overflow: hidden; margin-bottom: 12px; }
+  .photo-tab { flex: 1; padding: 8px; border: none; background: none; font-family: 'DM Sans', sans-serif; font-size: 0.78rem; font-weight: 600; cursor: pointer; color: var(--muted); transition: all 0.15s; }
+  .photo-tab.active { background: var(--accent); color: #fff; }
+
+  /* SETTINGS */
+  .settings-section { margin-bottom: 22px; }
+  .settings-section-title { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .github-status { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; margin-top: 10px; padding: 10px 14px; border-radius: 7px; background: #f5f2ee; }
+  .github-status.ok { background: #eaf7ee; color: #1e7e34; }
+  .github-status.error { background: #fdecea; color: var(--danger); }
+
+  /* CATEGORY MANAGER */
+  .cat-manage-list { display: flex; flex-direction: column; gap: 8px; }
+  .cat-manage-item { display: flex; align-items: center; justify-content: space-between; background: var(--bg); padding: 10px 14px; border-radius: 7px; font-size: 0.88rem; font-weight: 500; }
+
+  /* SETUP BANNER */
+  .setup-banner { background: #fffbf0; border: 1.5px solid var(--accent2); border-radius: 10px; padding: 18px 22px; margin-bottom: 30px; display: flex; align-items: flex-start; gap: 14px; }
+  .setup-banner-icon { font-size: 1.4rem; flex-shrink: 0; }
+  .setup-banner h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 4px; color: var(--accent); }
+  .setup-banner p { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+  .setup-banner .btn { margin-top: 10px; }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 30px; right: 30px; background: var(--accent); color: #fff; padding: 12px 22px; border-radius: 8px; font-size: 0.85rem; font-weight: 500; z-index: 9999; box-shadow: 0 6px 20px rgba(0,0,0,0.2); transform: translateY(20px); opacity: 0; transition: all 0.25s; pointer-events: none; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { background: var(--success); }
+  .toast.error { background: var(--danger); }
+
+  /* PRINT */
+  @media print {
+    header, .admin-bar, .cat-nav, .card-admin-btns, .modal-overlay, .toast, .setup-banner { display: none !important; }
+    body { background: #fff; }
+    main { padding: 20px; max-width: 100%; }
+    .products-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .product-card { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
+    .card-img-wrap { height: 160px; }
+    .card-table thead tr { background: #333 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .card-table tbody tr:nth-child(even) { background: #f0f0f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .cat-section { page-break-after: always; }
+    .cat-section:last-child { page-break-after: avoid; }
+    .section-header { border-bottom: 2px solid #000; }
+  }
+
+  @media (max-width: 768px) {
+    header { padding: 16px 20px; }
+    main { padding: 20px; }
+    .cat-nav { padding: 0 20px; }
+    .admin-bar { padding: 10px 20px; }
+    .form-row { grid-template-columns: 1fr; }
+    .brand-name { font-size: 1.4rem; }
+    .variant-row, .variant-cols { grid-template-columns: 1fr 1fr auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ADMIN BAR -->
+<div class="admin-bar" id="adminBar">
+  <div style="display:flex;align-items:center;gap:16px;">
+    <div class="admin-bar-label"><div class="admin-bar-dot"></div>Admin Mode</div>
+    <div class="save-status" id="saveStatus"><div class="save-dot" id="saveDot"></div><span id="saveText">All saved</span></div>
+  </div>
+  <div class="admin-bar-actions">
+    <button class="btn btn-gold btn-sm" onclick="openAddProduct()">＋ Add Product</button>
+    <button class="btn btn-outline btn-sm" onclick="openModal('manageCategories')">⊞ Categories</button>
+    <button class="btn btn-outline btn-sm" onclick="openModal('settings')">⚙ Settings</button>
+    <button class="btn btn-outline btn-sm" onclick="exitAdmin()">Exit Admin</button>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="brand">
+    <div class="brand-name" id="headerBrandName">My Brand</div>
+    <div class="brand-sub" id="headerBrandSub">PRICE LIST</div>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-outline" onclick="window.print()">🖨 Print</button>
+    <button class="btn btn-gold" onclick="openModal('login')" id="adminBtn">Admin</button>
+  </div>
+</header>
+
+<!-- CATEGORY NAV -->
+<nav class="cat-nav" id="catNav"></nav>
+
+<!-- MAIN -->
+<main id="mainContent">
+  <div class="state-box">
+    <div class="spinner"></div>
+    <h3>Loading...</h3>
+    <p>Fetching your product data from GitHub.</p>
+  </div>
+</main>
+
+<!-- ── MODALS ── -->
+
+<!-- LOGIN -->
+<div class="modal-overlay" id="modal-login">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Admin Login</div>
+      <button class="modal-close" onclick="closeModal('login')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-control" type="password" id="loginPassword" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="doLogin()">Login</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="modal-overlay" id="modal-settings">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Settings</div>
+      <button class="modal-close" onclick="closeModal('settings')">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="settings-section">
+        <div class="settings-section-title">GitHub Storage</div>
+        <p style="font-size:0.82rem;color:var(--muted);margin-bottom:14px;line-height:1.6;">
+          Your product data is saved to <code style="background:#f0ede8;padding:2px 5px;border-radius:3px;">data/products.json</code> in your GitHub repo. You need a Personal Access Token (PAT) to save — visitors can always view without one.
+        </p>
+        <div class="form-row">
+          <div class="form-group" style="margin:0">
+            <label class="form-label">GitHub Username</label>
+            <input class="form-control" id="ghUser" placeholder="yourusername">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label class="form-label">Repository Name</label>
+            <input class="form-control" id="ghRepo" placeholder="pricelist">
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:14px;">
+          <label class="form-label">Branch</label>
+          <input class="form-control" id="ghBranch" placeholder="main" value="main">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Personal Access Token (PAT)</label>
+          <input class="form-control" type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+          <div class="form-hint">
+            Stored only in your browser. Never shared publicly.<br>
+            Create one at: <a href="https://github.com/settings/tokens/new" target="_blank">github.com/settings/tokens</a> → select <code>repo</code> scope.
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="testGitHub()">Test Connection</button>
+        <div class="github-status" id="ghStatus" style="display:none;"></div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Brand</div>
+        <div class="form-row">
+          <div class="form-group" style="margin:0">
+            <label class="form-label">Brand Name</label>
+            <input class="form-control" id="setBrandName" placeholder="e.g. MUPHY">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label class="form-label">Tagline</label>
+            <input class="form-control" id="setBrandSub" placeholder="e.g. HARDWARE">
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Theme Colors</div>
+        <div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap;">
+          <div>
+            <div class="form-label" style="margin-bottom:6px;">Accent</div>
+            <input type="color" id="setAccentColor" value="#1a3a4a" style="height:36px;width:60px;border:none;cursor:pointer;border-radius:6px;">
+          </div>
+          <div>
+            <div class="form-label" style="margin-bottom:6px;">Gold</div>
+            <input type="color" id="setGoldColor" value="#c8a96e" style="height:36px;width:60px;border:none;cursor:pointer;border-radius:6px;">
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Admin Password</div>
+        <div class="form-row">
+          <div class="form-group" style="margin:0">
+            <label class="form-label">New Password</label>
+            <input class="form-control" type="password" id="setNewPass" placeholder="New password">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label class="form-label">Confirm</label>
+            <input class="form-control" type="password" id="setConfPass" placeholder="Confirm">
+          </div>
+        </div>
+        <div class="form-hint">Leave blank to keep current password. Default: <code>admin123</code></div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('settings')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+    </div>
+  </div>
+</div>
+
+<!-- MANAGE CATEGORIES -->
+<div class="modal-overlay" id="modal-manageCategories">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Manage Categories</div>
+      <button class="modal-close" onclick="closeModal('manageCategories')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Add New Category</label>
+        <div style="display:flex;gap:10px;">
+          <input class="form-control" id="newCatName" placeholder="e.g. Door Handles" onkeydown="if(event.key==='Enter')addCategory()">
+          <button class="btn btn-primary" onclick="addCategory()">Add</button>
+        </div>
+      </div>
+      <div class="cat-manage-list" id="catManageList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD / EDIT PRODUCT -->
+<div class="modal-overlay" id="modal-addProduct">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="productModalTitle">Add Product</div>
+      <button class="modal-close" onclick="closeModal('addProduct')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editProductId">
+
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-control" id="prodCategory"></select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Product Name / Model</label>
+        <input class="form-control" id="prodName" placeholder="e.g. Model 501 or Cabinet Handle A">
+      </div>
+
+      <!-- PHOTO -->
+      <div class="form-group">
+        <label class="form-label">Photo</label>
+        <div class="photo-tabs">
+          <button class="photo-tab active" onclick="switchPhotoTab('upload', this)">📁 Upload</button>
+          <button class="photo-tab" onclick="switchPhotoTab('url', this)">🔗 URL / GitHub Link</button>
+        </div>
+
+        <div id="photoTabUpload">
+          <div class="photo-upload-area" id="photoUploadArea">
+            <input type="file" accept="image/*" id="photoInput" onchange="handlePhotoUpload(this)">
+            <div id="photoUploadContent">
+              <div class="upload-icon">📷</div>
+              <div class="upload-text">Click to upload a photo</div>
+              <div class="form-hint" style="margin-top:8px;">Tip: For GitHub storage, upload images to your repo's <code>images/</code> folder and use the URL tab instead — base64 uploads can make your JSON file very large.</div>
+            </div>
+            <img id="photoPreview" class="photo-preview" alt="Preview">
+          </div>
+        </div>
+
+        <div id="photoTabUrl" style="display:none;">
+          <input class="form-control" id="prodPhotoUrl" placeholder="https://raw.githubusercontent.com/you/repo/main/images/product.jpg" onblur="updatePhotoFromUrl()">
+          <div class="form-hint">Paste any image URL. For GitHub images: upload to your repo's <code>images/</code> folder, then right-click the image → Copy image address.</div>
+          <img id="photoUrlPreview" style="width:100%;max-height:150px;object-fit:cover;border-radius:8px;margin-top:10px;display:none;" alt="">
+        </div>
+        <input type="hidden" id="prodPhoto">
+      </div>
+
+      <!-- VARIANTS -->
+      <div>
+        <div class="variants-header">
+          <span class="variants-label">Variants</span>
+          <button class="btn btn-sm btn-primary" onclick="addVariantRow()">+ Add Row</button>
+        </div>
+        <div class="variant-cols">
+          <span class="variant-col-label">Finish</span>
+          <span class="variant-col-label">Size</span>
+          <span class="variant-col-label">Price (MRP)</span>
+          <span></span>
+        </div>
+        <div id="variantRows"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('addProduct')">Cancel</button>
+      <button class="btn btn-primary" id="saveProductBtn" onclick="saveProduct()">Save Product</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+const DEFAULT_STATE = {
+  brandName: 'My Brand',
+  brandSub: 'PRICE LIST',
+  accentColor: '#1a3a4a',
+  goldColor: '#c8a96e',
+  adminPass: 'admin123',
+  categories: [],
+  products: []
+};
+
+let state = { ...DEFAULT_STATE };
+let isAdmin = false;
+let activeCategory = 'all';
+let editingProductId = null;
+
+// GitHub config stored in localStorage (not in the public JSON)
+let ghConfig = {
+  user: '', repo: '', branch: 'main', token: ''
+};
+
+let dataFileSHA = null; // needed for GitHub API updates
+
+// ═══════════════════════════════════════════
+//  GITHUB API
+// ═══════════════════════════════════════════
+function ghHeaders(withAuth = false) {
+  const h = { 'Content-Type': 'application/json', 'Accept': 'application/vnd.github+json' };
+  if (withAuth && ghConfig.token) h['Authorization'] = `Bearer ${ghConfig.token}`;
+  return h;
+}
+
+function ghContentUrl(path) {
+  return `https://api.github.com/repos/${ghConfig.user}/${ghConfig.repo}/contents/${path}?ref=${ghConfig.branch}`;
+}
+
+function rawUrl(path) {
+  return `https://raw.githubusercontent.com/${ghConfig.user}/${ghConfig.repo}/${ghConfig.branch}/${path}`;
+}
+
+async function loadFromGitHub() {
+  if (!ghConfig.user || !ghConfig.repo) {
+    // No GitHub config — try localStorage fallback
+    loadFromLocalStorage();
+    return;
+  }
+  try {
+    // Use raw URL (no auth needed for public repos)
+    const res = await fetch(rawUrl('data/products.json') + '?nocache=' + Date.now());
+    if (res.ok) {
+      const data = await res.json();
+      state = { ...DEFAULT_STATE, ...data };
+
+      // Also fetch SHA (needed for future updates) via API
+      fetchFileSHA();
+    } else if (res.status === 404) {
+      // File doesn't exist yet — fresh start
+      state = { ...DEFAULT_STATE };
+    } else {
+      throw new Error('HTTP ' + res.status);
+    }
+  } catch (e) {
+    showToast('Could not load from GitHub. Check your settings.', 'error');
+    loadFromLocalStorage();
+  }
+  applyTheme(); renderBrand(); renderCategoryNav(); renderProducts();
+}
+
+async function fetchFileSHA() {
+  if (!ghConfig.token) return;
+  try {
+    const res = await fetch(ghContentUrl('data/products.json'), { headers: ghHeaders(true) });
+    if (res.ok) {
+      const data = await res.json();
+      dataFileSHA = data.sha;
+    }
+  } catch(e) {}
+}
+
+async function saveToGitHub() {
+  if (!ghConfig.user || !ghConfig.repo || !ghConfig.token) {
+    showToast('Configure GitHub settings first', 'error');
+    return false;
+  }
+
+  setSaveStatus('saving');
+
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(state, null, 2))));
+  const body = {
+    message: 'Update price list data',
+    content,
+    branch: ghConfig.branch
+  };
+  if (dataFileSHA) body.sha = dataFileSHA;
+
+  try {
+    const res = await fetch(ghContentUrl('data/products.json'), {
+      method: 'PUT',
+      headers: ghHeaders(true),
+      body: JSON.stringify(body)
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      dataFileSHA = data.content?.sha;
+      setSaveStatus('saved');
+      return true;
+    } else {
+      const err = await res.json();
+      throw new Error(err.message || 'Save failed');
+    }
+  } catch(e) {
+    setSaveStatus('error');
+    showToast('Save failed: ' + e.message, 'error');
+    return false;
+  }
+}
+
+async function testGitHub() {
+  const user = document.getElementById('ghUser').value.trim();
+  const repo = document.getElementById('ghRepo').value.trim();
+  const branch = document.getElementById('ghBranch').value.trim() || 'main';
+  const token = document.getElementById('ghToken').value.trim();
+
+  const el = document.getElementById('ghStatus');
+  el.style.display = 'flex';
+  el.className = 'github-status';
+  el.textContent = '⏳ Testing...';
+
+  try {
+    const url = `https://api.github.com/repos/${user}/${repo}`;
+    const headers = { 'Accept': 'application/vnd.github+json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const res = await fetch(url, { headers });
+    const data = await res.json();
+    if (res.ok) {
+      el.className = 'github-status ok';
+      el.textContent = `✓ Connected to ${data.full_name} — ${token ? 'write access enabled' : 'read only (no token)'}`;
+    } else {
+      el.className = 'github-status error';
+      el.textContent = '✗ ' + (data.message || 'Connection failed');
+    }
+  } catch(e) {
+    el.className = 'github-status error';
+    el.textContent = '✗ Network error: ' + e.message;
+  }
+}
+
+// ═══════════════════════════════════════════
+//  LOCAL STORAGE (fallback)
+// ═══════════════════════════════════════════
+function loadFromLocalStorage() {
+  const raw = localStorage.getItem('priceListData');
+  if (raw) {
+    try { state = { ...DEFAULT_STATE, ...JSON.parse(raw) }; } catch(e) {}
+  }
+}
+
+function saveToLocalStorage() {
+  localStorage.setItem('priceListData', JSON.stringify(state));
+}
+
+function loadGhConfig() {
+  const raw = localStorage.getItem('priceListGH');
+  if (raw) {
+    try { ghConfig = { ...ghConfig, ...JSON.parse(raw) }; } catch(e) {}
+  }
+}
+
+function saveGhConfig() {
+  localStorage.setItem('priceListGH', JSON.stringify(ghConfig));
+}
+
+// ═══════════════════════════════════════════
+//  SAVE ORCHESTRATOR
+// ═══════════════════════════════════════════
+let saveTimer;
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  setSaveStatus('saving');
+  saveTimer = setTimeout(async () => {
+    if (ghConfig.user && ghConfig.repo && ghConfig.token) {
+      await saveToGitHub();
+    } else {
+      saveToLocalStorage();
+      setSaveStatus('saved');
+    }
+  }, 1000);
+}
+
+function setSaveStatus(status) {
+  const dot = document.getElementById('saveDot');
+  const txt = document.getElementById('saveText');
+  dot.className = 'save-dot ' + status;
+  if (status === 'saving') txt.textContent = 'Saving...';
+  else if (status === 'saved') txt.textContent = 'Saved to GitHub ✓';
+  else if (status === 'error') txt.textContent = 'Save error';
+  else txt.textContent = 'Saved';
+}
+
+// ═══════════════════════════════════════════
+//  THEME / BRAND
+// ═══════════════════════════════════════════
+function applyTheme() {
+  document.documentElement.style.setProperty('--accent', state.accentColor);
+  document.documentElement.style.setProperty('--accent2', state.goldColor);
+  document.documentElement.style.setProperty('--header-bg', state.accentColor);
+}
+
+function renderBrand() {
+  document.getElementById('headerBrandName').textContent = state.brandName;
+  document.getElementById('headerBrandSub').textContent = state.brandSub;
+  document.title = state.brandName + ' — Price List';
+}
+
+// ═══════════════════════════════════════════
+//  CATEGORY NAV
+// ═══════════════════════════════════════════
+function renderCategoryNav() {
+  const nav = document.getElementById('catNav');
+  nav.innerHTML = `<button class="cat-tab ${activeCategory==='all'?'active':''}" onclick="filterCategory('all',this)">All</button>`;
+  state.categories.forEach(cat => {
+    nav.innerHTML += `<button class="cat-tab ${activeCategory===cat?'active':''}" onclick="filterCategory(${JSON.stringify(cat)},this)">${esc(cat)}</button>`;
+  });
+}
+
+function filterCategory(cat, el) {
+  activeCategory = cat;
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderProducts();
+}
+
+// ═══════════════════════════════════════════
+//  RENDER PRODUCTS
+// ═══════════════════════════════════════════
+function renderProducts() {
+  const container = document.getElementById('mainContent');
+  const categories = activeCategory === 'all' ? state.categories : [activeCategory];
+
+  // Show setup banner if GitHub not configured and admin
+  let setupBanner = '';
+  if (isAdmin && (!ghConfig.user || !ghConfig.repo)) {
+    setupBanner = `<div class="setup-banner">
+      <div class="setup-banner-icon">⚙️</div>
+      <div>
+        <h4>GitHub Storage Not Configured</h4>
+        <p>Your changes save only in this browser right now. Set up GitHub in Settings to save your data permanently to your repo.</p>
+        <button class="btn btn-primary btn-sm" onclick="openModal('settings')">Configure GitHub</button>
+      </div>
+    </div>`;
+  }
+
+  if (state.products.length === 0 && state.categories.length === 0) {
+    container.innerHTML = setupBanner + `<div class="state-box">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      <h3>No products yet</h3>
+      <p>Log in as admin, add some categories, then start adding your products.</p>
+    </div>`;
+    return;
+  }
+
+  let html = setupBanner;
+  let anyShown = false;
+
+  categories.forEach(cat => {
+    const prods = state.products.filter(p => p.category === cat);
+    if (prods.length === 0 && activeCategory !== 'all') {
+      html += `<div class="cat-section">
+        <div class="section-header"><div class="section-title">${esc(cat)}</div><span class="section-count">0 items</span></div>
+        <div class="state-box" style="padding:40px 20px;"><p>No products in this category yet.</p></div>
+      </div>`;
+      return;
+    }
+    if (prods.length === 0) return;
+    anyShown = true;
+
+    html += `<div class="cat-section" id="section-${slugify(cat)}">
+      <div class="section-header">
+        <div class="section-title">${esc(cat)}</div>
+        <span class="section-count">${prods.length} item${prods.length!==1?'s':''}</span>
+      </div>
+      <div class="products-grid">`;
+
+    prods.forEach(p => {
+      const imgHtml = p.photo
+        ? `<img src="${p.photo}" alt="${esc(p.name)}" loading="lazy">`
+        : `<div class="card-no-img"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span>No photo</span></div>`;
+
+      const rows = (p.variants||[]).map(v =>
+        `<tr><td>${esc(v.finish||'')}</td><td>${esc(v.size||'—')}</td><td class="price">${esc(v.price||'')}</td></tr>`
+      ).join('');
+
+      html += `<div class="product-card" data-id="${p.id}">
+        <div class="card-img-wrap">
+          ${imgHtml}
+          <div class="card-admin-btns">
+            <button class="btn-edit-card" onclick="editProduct('${p.id}')" title="Edit">✏</button>
+            <button class="btn-del-card" onclick="deleteProduct('${p.id}')" title="Delete">✕</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">${esc(p.name)}</div>
+          <table class="card-table">
+            <thead><tr><th>Finish</th><th>Size</th><th>MRP</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      </div>`;
+    });
+
+    html += `</div></div>`;
+  });
+
+  if (!anyShown && activeCategory === 'all') {
+    html += `<div class="state-box"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><h3>No products yet</h3><p>Add your first product using the admin panel.</p></div>`;
+  }
+
+  container.innerHTML = html;
+  if (isAdmin) document.body.classList.add('admin-mode');
+}
+
+// ═══════════════════════════════════════════
+//  ADMIN AUTH
+// ═══════════════════════════════════════════
+function doLogin() {
+  const pass = document.getElementById('loginPassword').value;
+  if (pass === state.adminPass) {
+    isAdmin = true;
+    document.body.classList.add('admin-mode');
+    document.getElementById('adminBar').classList.add('visible');
+    document.getElementById('adminBtn').style.display = 'none';
+    closeModal('login');
+    document.getElementById('loginPassword').value = '';
+    // fetch SHA now so we can save
+    fetchFileSHA();
+    showToast('Welcome, Admin!', 'success');
+    renderProducts(); // re-render to show setup banner if needed
+  } else {
+    showToast('Incorrect password', 'error');
+  }
+}
+
+function exitAdmin() {
+  isAdmin = false;
+  document.body.classList.remove('admin-mode');
+  document.getElementById('adminBar').classList.remove('visible');
+  document.getElementById('adminBtn').style.display = '';
+  renderProducts();
+  showToast('Exited admin mode');
+}
+
+// ═══════════════════════════════════════════
+//  CATEGORIES
+// ═══════════════════════════════════════════
+function renderCategoryList() {
+  const list = document.getElementById('catManageList');
+  if (!state.categories.length) {
+    list.innerHTML = '<div style="color:var(--muted);font-size:0.85rem;text-align:center;padding:16px;">No categories yet.</div>';
+    return;
+  }
+  list.innerHTML = state.categories.map((cat, i) => `
+    <div class="cat-manage-item">
+      <span>${esc(cat)}</span>
+      <button class="btn btn-danger btn-xs" onclick="deleteCategory(${i})">Delete</button>
+    </div>`).join('');
+}
+
+function addCategory() {
+  const name = document.getElementById('newCatName').value.trim();
+  if (!name) return;
+  if (state.categories.includes(name)) { showToast('Already exists', 'error'); return; }
+  state.categories.push(name);
+  scheduleSave();
+  document.getElementById('newCatName').value = '';
+  renderCategoryList();
+  renderCategoryNav();
+  renderProducts();
+  showToast('Category added', 'success');
+}
+
+function deleteCategory(i) {
+  const cat = state.categories[i];
+  if (state.products.some(p => p.category === cat)) { showToast('Cannot delete — has products', 'error'); return; }
+  if (!confirm(`Delete category "${cat}"?`)) return;
+  state.categories.splice(i, 1);
+  if (activeCategory === cat) activeCategory = 'all';
+  scheduleSave();
+  renderCategoryList();
+  renderCategoryNav();
+  renderProducts();
+}
+
+// ═══════════════════════════════════════════
+//  PRODUCT FORM
+// ═══════════════════════════════════════════
+function openAddProduct() {
+  editingProductId = null;
+  document.getElementById('productModalTitle').textContent = 'Add Product';
+  document.getElementById('editProductId').value = '';
+  document.getElementById('prodName').value = '';
+  document.getElementById('prodPhoto').value = '';
+  document.getElementById('prodPhotoUrl').value = '';
+  document.getElementById('photoPreview').style.display = 'none';
+  document.getElementById('photoUrlPreview').style.display = 'none';
+  document.getElementById('photoUploadContent').style.display = '';
+  document.getElementById('variantRows').innerHTML = '';
+  switchPhotoTab('upload', document.querySelector('.photo-tab'));
+  addVariantRow();
+  const sel = document.getElementById('prodCategory');
+  sel.innerHTML = state.categories.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+  openModal('addProduct');
+}
+
+function editProduct(id) {
+  const p = state.products.find(x => x.id === id);
+  if (!p) return;
+  editingProductId = id;
+  document.getElementById('productModalTitle').textContent = 'Edit Product';
+  document.getElementById('prodName').value = p.name;
+  const sel = document.getElementById('prodCategory');
+  sel.innerHTML = state.categories.map(c => `<option value="${esc(c)}" ${c===p.category?'selected':''}>${esc(c)}</option>`).join('');
+
+  // photo
+  document.getElementById('prodPhoto').value = p.photo || '';
+  if (p.photo) {
+    const isDataUrl = p.photo.startsWith('data:');
+    if (isDataUrl) {
+      switchPhotoTab('upload', document.querySelectorAll('.photo-tab')[0]);
+      document.getElementById('photoPreview').src = p.photo;
+      document.getElementById('photoPreview').style.display = 'block';
+      document.getElementById('photoUploadContent').style.display = 'none';
+    } else {
+      switchPhotoTab('url', document.querySelectorAll('.photo-tab')[1]);
+      document.getElementById('prodPhotoUrl').value = p.photo;
+      document.getElementById('photoUrlPreview').src = p.photo;
+      document.getElementById('photoUrlPreview').style.display = 'block';
+    }
+  } else {
+    switchPhotoTab('upload', document.querySelectorAll('.photo-tab')[0]);
+    document.getElementById('photoPreview').style.display = 'none';
+    document.getElementById('photoUploadContent').style.display = '';
+  }
+
+  document.getElementById('variantRows').innerHTML = '';
+  (p.variants||[]).forEach(v => addVariantRow(v));
+  if (!p.variants?.length) addVariantRow();
+  openModal('addProduct');
+}
+
+function addVariantRow(data) {
+  const row = document.createElement('div');
+  row.className = 'variant-row';
+  row.innerHTML = `
+    <input placeholder="e.g. Satin" value="${esc(data?.finish||'')}">
+    <input placeholder="e.g. 96mm" value="${esc(data?.size||'')}">
+    <input placeholder="e.g. 250/-" value="${esc(data?.price||'')}">
+    <button class="btn-remove-variant" onclick="this.parentElement.remove()" title="Remove">✕</button>`;
+  document.getElementById('variantRows').appendChild(row);
+}
+
+function handlePhotoUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const dataUrl = e.target.result;
+    document.getElementById('prodPhoto').value = dataUrl;
+    document.getElementById('photoPreview').src = dataUrl;
+    document.getElementById('photoPreview').style.display = 'block';
+    document.getElementById('photoUploadContent').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function updatePhotoFromUrl() {
+  const url = document.getElementById('prodPhotoUrl').value.trim();
+  document.getElementById('prodPhoto').value = url;
+  if (url) {
+    document.getElementById('photoUrlPreview').src = url;
+    document.getElementById('photoUrlPreview').style.display = 'block';
+  } else {
+    document.getElementById('photoUrlPreview').style.display = 'none';
+  }
+}
+
+function switchPhotoTab(tab, el) {
+  document.querySelectorAll('.photo-tab').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  document.getElementById('photoTabUpload').style.display = tab === 'upload' ? '' : 'none';
+  document.getElementById('photoTabUrl').style.display = tab === 'url' ? '' : 'none';
+}
+
+async function saveProduct() {
+  const name = document.getElementById('prodName').value.trim();
+  const category = document.getElementById('prodCategory').value;
+  const photo = document.getElementById('prodPhoto').value;
+
+  if (!name) { showToast('Name is required', 'error'); return; }
+  if (!category) { showToast('Select a category', 'error'); return; }
+
+  const variantEls = document.querySelectorAll('#variantRows .variant-row');
+  const variants = [];
+  variantEls.forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    const finish = inputs[0].value.trim();
+    const size = inputs[1].value.trim();
+    const price = inputs[2].value.trim();
+    if (finish || price) variants.push({ finish, size, price });
+  });
+  if (!variants.length) { showToast('Add at least one variant', 'error'); return; }
+
+  const btn = document.getElementById('saveProductBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  if (editingProductId) {
+    const idx = state.products.findIndex(p => p.id === editingProductId);
+    if (idx > -1) state.products[idx] = { ...state.products[idx], name, category, photo, variants };
+  } else {
+    state.products.push({ id: uid(), name, category, photo, variants });
+  }
+
+  scheduleSave();
+  closeModal('addProduct');
+  renderCategoryNav();
+  renderProducts();
+  showToast(editingProductId ? 'Product updated' : 'Product added', 'success');
+
+  btn.disabled = false;
+  btn.textContent = 'Save Product';
+}
+
+function deleteProduct(id) {
+  if (!confirm('Delete this product?')) return;
+  state.products = state.products.filter(p => p.id !== id);
+  scheduleSave();
+  renderProducts();
+  showToast('Product deleted');
+}
+
+// ═══════════════════════════════════════════
+//  SETTINGS
+// ═══════════════════════════════════════════
+function openSettings() {
+  document.getElementById('ghUser').value = ghConfig.user;
+  document.getElementById('ghRepo').value = ghConfig.repo;
+  document.getElementById('ghBranch').value = ghConfig.branch;
+  document.getElementById('ghToken').value = ghConfig.token;
+  document.getElementById('setBrandName').value = state.brandName;
+  document.getElementById('setBrandSub').value = state.brandSub;
+  document.getElementById('setAccentColor').value = state.accentColor;
+  document.getElementById('setGoldColor').value = state.goldColor;
+  document.getElementById('setNewPass').value = '';
+  document.getElementById('setConfPass').value = '';
+  document.getElementById('ghStatus').style.display = 'none';
+  openModal('settings');
+}
+
+function saveSettings() {
+  // GitHub
+  ghConfig.user = document.getElementById('ghUser').value.trim();
+  ghConfig.repo = document.getElementById('ghRepo').value.trim();
+  ghConfig.branch = document.getElementById('ghBranch').value.trim() || 'main';
+  ghConfig.token = document.getElementById('ghToken').value.trim();
+  saveGhConfig();
+
+  // Brand
+  state.brandName = document.getElementById('setBrandName').value.trim() || state.brandName;
+  state.brandSub = document.getElementById('setBrandSub').value.trim() || state.brandSub;
+  state.accentColor = document.getElementById('setAccentColor').value;
+  state.goldColor = document.getElementById('setGoldColor').value;
+
+  // Password
+  const np = document.getElementById('setNewPass').value;
+  const cp = document.getElementById('setConfPass').value;
+  if (np) {
+    if (np !== cp) { showToast('Passwords do not match', 'error'); return; }
+    state.adminPass = np;
+  }
+
+  scheduleSave();
+  applyTheme();
+  renderBrand();
+  closeModal('settings');
+  showToast('Settings saved', 'success');
+
+  // If GitHub just configured, fetch SHA
+  if (ghConfig.token) fetchFileSHA();
+}
+
+// ═══════════════════════════════════════════
+//  MODALS
+// ═══════════════════════════════════════════
+function openModal(name) {
+  if (name === 'manageCategories') renderCategoryList();
+  if (name === 'settings') openSettings();
+  document.getElementById('modal-' + name).classList.add('open');
+}
+
+function closeModal(name) {
+  document.getElementById('modal-' + name).classList.remove('open');
+}
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+// ═══════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════
+let toastTimer;
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' '+type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ═══════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════
+function uid() { return Math.random().toString(36).slice(2,9) + Date.now().toString(36); }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function slugify(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g,'-'); }
+
+// ═══════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════
+loadGhConfig();
+loadFromGitHub();
+</script>
+</body>
+</html>
