@@ -6,7 +6,8 @@
   "adminPass": "admin123",
   "categories": [
     "Door Handles",
-    "Window Handles"
+    "Window Handles",
+    "Screws"
   ],
   "products": [
     {
@@ -71,6 +72,19 @@
           "finish": "hbh",
           "size": "34",
           "price": "3444"
+        }
+      ]
+    },
+    {
+      "id": "luc5k18mn5xe4p5",
+      "name": "93",
+      "category": "Screws",
+      "photo": "https://github.com/pranavgupta0001/cdc/blob/main/images/products/Schroef.jpg?raw=true",
+      "variants": [
+        {
+          "finish": "uu",
+          "size": "44",
+          "price": "34"
         }
       ]
     }
