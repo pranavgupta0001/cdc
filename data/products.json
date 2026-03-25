@@ -1,8 +1,8 @@
 {
   "brandName": "CDC",
   "brandSub": "Hardware Price List",
-  "accentColor": "#bcd732",
-  "goldColor": "#38393c",
+  "accentColor": "#37393c",
+  "goldColor": "#bcd731",
   "adminPass": "admin123",
   "categories": [
     "Door Handles",
